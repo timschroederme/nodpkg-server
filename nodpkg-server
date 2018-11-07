@@ -1,0 +1,92 @@
+#!/usr/bin/env python3
+
+from datetime import datetime
+from lib.dbconnector import DBConnector
+from lib.scraper import Scraper
+from lib.logger import log
+
+dateformat = "%Y-%m-%d %H:%M:%S"
+
+# Main
+
+# Prepare DB
+db = DBConnector("projects.db")
+
+'''
+db.insert_project(name="docker-15",
+                  site="www.docker.com",
+                  url="www.github.com/releases",
+                  xpath="//coweim/234/w")
+'''
+
+any_change = False
+
+# Main Update Loop
+
+db.start_iteration()
+while True:
+    project = db.get_next_project()
+    if not project:
+        break
+
+    scraper = Scraper(project)
+    version = scraper.scrape()
+
+    # Update meta data
+    now = datetime.now().strftime(dateformat)
+    project['last_update'] = now
+
+    # Check if initial run
+    if not project['version']:
+        project['version'] = version
+        log(project['name'] + " .. initial: " + version)
+    else:
+        # Check if changed
+        if project['version'] != version:
+            project['last_release'] = now
+            project['version'] = version
+            log(project['name'] + ' .. updated to: ' + version)
+            any_change = True
+        else:
+            log(project['name'] + ' .. up to date')
+
+    # Store updated project
+    db.update_project(project)
+
+
+# If anything changed, re-generate website
+any_change = True
+if any_change:
+    updated_today = []
+    updated_last7 = []
+    updated_last30 = []
+    now = datetime.now().date()
+    db.start_iteration()
+    while True:
+        project = db.get_next_project()
+        if not project:
+            break
+        if project['last_release']:
+            last_update = datetime.strptime(project['last_release'], dateformat).date()
+            delta = (now - last_update).days
+            if delta == 0:
+                updated_today.append(project)
+            else:
+                if delta <= 7:
+                    updated_last7.append(project)
+                else:
+                    if delta <= 30:
+                        updated_last30.append(project)
+
+    print("")
+    print("Last release within the last 24 hours:")
+    for x in updated_today:
+        print(x['name'])
+
+    print("Last release longer than 24 hours, but within the last 7 days:")
+    for x in updated_last7:
+        print(x['name'])
+
+    print("Last release longer than 7 days, but within the last 30 days:")
+    for x in updated_last30:
+        print(x['name'])
