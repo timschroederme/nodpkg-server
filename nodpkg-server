@@ -1,92 +1,109 @@
 #!/usr/bin/env python3
 
+import glob
+import json
 from datetime import datetime
-from lib.dbconnector import DBConnector
-from lib.scraper import Scraper
-from lib.logger import log
+import requests
+from lxml import html
+import os.path
 
-dateformat = "%Y-%m-%d %H:%M:%S"
+DATEFORMAT = "%Y-%m-%d %H:%M:%S"
+NOPACKAGES_PATH = "nopackages/*.json"
+LATEST_VERSIONS = ".latest-versions"
+LATEST_CHECKS = ".latest-checks"
+
+
+def scrape(url, xpath):
+    response = requests.get(url)
+    tree = html.fromstring(response.content)
+    path = tree.xpath(xpath + "/text()")
+    raw = path[0]
+    if len(path) > 1:
+        for r in path:
+            r_clean = r.strip().replace('\n', '').replace('\r', '')
+            if len(r_clean) > 0:
+                raw = r_clean
+    raw_version = raw.strip().replace('\n', ' ').replace('\r', '')
+
+    first = -1
+    last = 0
+    for i, c in enumerate(raw_version):
+        if c.isdigit():
+            if first == -1:
+                first = i
+            last = i
+
+    version = raw_version[first:last + 1]
+    return version
+
+
+def load_latest_versions():
+    if os.path.exists(LATEST_VERSIONS):
+        with open(LATEST_VERSIONS, 'r') as file:
+            return json.loads(file.read())
+    else:
+        return {}
+
+
+def store_latest_versions(versions):
+    with open(LATEST_VERSIONS, 'w') as file:
+        file.write(json.dumps(versions, indent=2))
+
+
+def load_latest_checks():
+    if os.path.exists(LATEST_CHECKS):
+        with open(LATEST_CHECKS, 'r') as file:
+            return json.loads(file.read())
+    else:
+        return {}
+
+
+def store_latest_checks(checks):
+    with open(LATEST_CHECKS, 'w') as file:
+        file.write(json.dumps(checks, indent=2))
+
+
+def broadcast_update():
+    print("update!")
+
 
 # Main
-
-# Prepare DB
-db = DBConnector("projects.db")
-
-'''
-db.insert_project(name="docker-15",
-                  site="www.docker.com",
-                  url="www.github.com/releases",
-                  xpath="//coweim/234/w")
-'''
-
 any_change = False
+latest_versions = load_latest_versions()
+latest_checks = load_latest_checks()
 
 # Main Update Loop
+for filename in glob.glob(NOPACKAGES_PATH):
+    with open(filename) as f:
+        data = json.load(f)
+        name = data['name']
+        print(name + "..", end='')
 
-db.start_iteration()
-while True:
-    project = db.get_next_project()
-    if not project:
-        break
+        # check if project is due for a check
+        needs_check = True
+        if name in latest_checks:
+            stamp = datetime.strptime(latest_checks[name], DATEFORMAT)
+            delta = datetime.now() - stamp
+            h = divmod(delta.total_seconds(), 3600)[0]  # hours
+            if h < 12:
+                needs_check = False
+                print (" skip")
 
-    scraper = Scraper(project)
-    version = scraper.scrape()
-
-    # Update meta data
-    now = datetime.now().strftime(dateformat)
-    project['last_update'] = now
-
-    # Check if initial run
-    if not project['version']:
-        project['version'] = version
-        log(project['name'] + " .. initial: " + version)
-    else:
-        # Check if changed
-        if project['version'] != version:
-            project['last_release'] = now
-            project['version'] = version
-            log(project['name'] + ' .. updated to: ' + version)
-            any_change = True
-        else:
-            log(project['name'] + ' .. up to date')
-
-    # Store updated project
-    db.update_project(project)
-
-
-# If anything changed, re-generate website
-any_change = True
-if any_change:
-    updated_today = []
-    updated_last7 = []
-    updated_last30 = []
-    now = datetime.now().date()
-    db.start_iteration()
-    while True:
-        project = db.get_next_project()
-        if not project:
-            break
-        if project['last_release']:
-            last_update = datetime.strptime(project['last_release'], dateformat).date()
-            delta = (now - last_update).days
-            if delta == 0:
-                updated_today.append(project)
-            else:
-                if delta <= 7:
-                    updated_last7.append(project)
+        if needs_check:
+            # check if new release is available
+            v = scrape(data['url'], data['xpath'])
+            if name in latest_versions:
+                if latest_versions[name] == v:
+                    print (" ok")
                 else:
-                    if delta <= 30:
-                        updated_last30.append(project)
+                    print (" new release")
+                    latest_versions[name] = v
+                    broadcast_update()
+            else:
+                print (" initial check")
+                latest_versions[name] = v
+            latest_checks[name] = datetime.now().strftime(DATEFORMAT)
 
-    print("")
-    print("Last release within the last 24 hours:")
-    for x in updated_today:
-        print(x['name'])
-
-    print("Last release longer than 24 hours, but within the last 7 days:")
-    for x in updated_last7:
-        print(x['name'])
-
-    print("Last release longer than 7 days, but within the last 30 days:")
-    for x in updated_last30:
-        print(x['name'])
+# Store updated metadata
+store_latest_versions(latest_versions)
+store_latest_checks(latest_checks)
