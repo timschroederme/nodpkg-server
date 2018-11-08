@@ -1,0 +1,5 @@
+{
+  "name":   "linux-kernel",
+  "url":    "https://www.kernel.org/",
+  "xpath":  "//*[@id='latest_link']/a"
+}

@@ -1,0 +1,5 @@
+{
+  "name":   "mediawiki",
+  "url":    "https://phabricator.wikimedia.org/source/mediawiki/tags/master/",
+  "xpath":  "//*[@id='phabricator-standard-page-body']/div[2]/div/div[4]/div/ul/li[1]/div/div/div/div/div/div[1]/div[1]/span/a"
+}
