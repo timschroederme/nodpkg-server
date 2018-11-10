@@ -42,6 +42,13 @@ def scrape(url, xpath):
                 first = i
             last = i
 
+    # check if there is "alpha" or "beta" in version string (like with bash)
+    nl = raw_version.find('alpha')
+    if nl != -1 and (nl + len('alpha')) > last:
+        last = nl + len('alpha')
+    nl = raw_version.find('beta')
+    if nl != -1 and (nl + len('beta')) > last:
+        last = nl + len('beta')
     version = raw_version[first:last + 1]
     return version
 
