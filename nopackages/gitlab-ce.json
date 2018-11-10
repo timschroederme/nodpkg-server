@@ -1,0 +1,6 @@
+{
+  "name":   "gitlab-ce",
+  "site":   "https://gitlab.com/gitlab-org/gitlab-ce/",
+  "url":    "https://gitlab.com/gitlab-org/gitlab-ce/tags",
+  "xpath":  "/html/body/div/div[2]/div[3]/div/div/div[2]/ul/li[1]/div[1]/a"
+}
