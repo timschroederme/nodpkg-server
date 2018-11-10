@@ -1,5 +1,6 @@
 {
   "name":   "jekyll",
+  "site":   "https://github.com/jekyll/jekyll",
   "url":    "https://github.com/jekyll/jekyll/releases/latest",
   "xpath":  "/html/body/div[4]/div/div/div[2]/div[1]/div[3]/div/div[2]/div[1]/div/div/a"
 }

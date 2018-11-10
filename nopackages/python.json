@@ -1,5 +1,6 @@
 {
   "name":   "python",
+  "site":   "https://github.com/python/cpython",
   "url":    "https://www.python.org/downloads/",
   "xpath":  "//*[@id='content']/div/section/div[1]/ol/li[1]/span[1]/a"
 }

@@ -1,5 +1,6 @@
 {
   "name":   "ruby",
+  "site":   "https://github.com/ruby/ruby",
   "url":    "https://github.com/ruby/ruby/releases/latest",
   "xpath":  "/html/body/div[4]/div/div/div[2]/div[1]/div[3]/div/div[1]/div/div/div/div[1]/h4/a"
 }

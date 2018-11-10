@@ -1,5 +1,6 @@
 {
   "name":   "wp-gdpr-compliance",
+  "site":   "http://plugins.svn.wordpress.org/wp-gdpr-compliance/",
   "url":    "https://plugins.svn.wordpress.org/wp-gdpr-compliance/tags/",
   "xpath":  "/html/body/ul/li[last()]/a"
 }

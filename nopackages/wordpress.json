@@ -1,5 +1,6 @@
 {
   "name":   "wordpress",
+  "site":   "https://core.trac.wordpress.org/browser/trunk",
   "url":    "https://core.trac.wordpress.org/log/tags",
   "xpath":  "/html/body/div[5]/div[2]/form[2]/table/tbody/tr[1]/td[6]"
 }

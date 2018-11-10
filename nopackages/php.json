@@ -1,5 +1,6 @@
 {
   "name":   "php",
+  "site":   "https://github.com/php/php-src",
   "url":    "https://github.com/php/php-src/releases",
   "xpath":  "/html/body/div[4]/div/div/div[2]/div[1]/div[3]/div/div[1]/div/div/div/div[2]/pre"
 }
