@@ -1,0 +1,6 @@
+{
+  "name":   "docker-ce",
+  "site":   "https://github.com/docker/docker-ce",
+  "url":    "https://github.com/docker/docker-ce/releases/latest",
+  "xpath":  "/html/body/div[4]/div/div/div[2]/div[1]/div[3]/div/div[2]/div[1]/div/div/a"
+}
