@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="author" content="Tim Schröder">
+        <title>nodpkg.sh</title>
+        <style>body{font-family: sans-serif; font-size: 120%;margin:30px;}</style>
+    </head>
+    <body>
+        <h1>nodpkg</h1>
+        <ul>
+            <li>nodpkg broadcasts new releases of open source software projects.</li>
+            <li>For when there is no package available. Or not yet.</li>
+            <li>Consider nodpkg your friendly automated release monitoring bot.</li>
+            <li>nodpkg is <a href="https://github.com/timschroedernet/nodpkg-server">open source</a> and covered by a MIT license.</li>
+        </ul>
+        <h2>Follow</h2>
+        <ul>
+            <li>Follow nodpkg on <a href="https://twitter.com/nodpkg">Twitter</a>.</li>
+            <li>Coming soon: Follow nodpkg on Telegram.</li>
+        </ul>
+        <h2>How Does It Work</h2>
+        <ul>
+            <li>nodpkg monitors all open source projects for which it has a configuration file. See below to learn which projects are included at the moment.</li>
+            <li>nodpkg visits the repositories of each project regularly, twice per day.</li>
+            <li>nodpkg checks if any new release has been published there.</li>
+            <li>If it has, nodpkg will let the world know.</li>
+        </ul>
+        <h2>Questions</h2>
+        <ul>
+            <li><i>Why does nodpkg monitor only a few open source projects?</i> I started nodpkg as a personal project, so that I could easily monitor updates of those open source projects I use in my own projects. Seeing the potential behind this, I'm working on adding more projects to nodpkg. If you want to help, contribute on <a href="https://github.com/timschroedernet/nodpkg-server">GitHub</a>.</li>
+        </ul>
+        <h2>Alternatives</h2>
+        <p>If you don't like nodpkg, try one of these:</p>
+        <ul>
+            <li><a href=https://release-monitoring.org/">release-monitoring.org</a>, powered by <a href="https://github.com/release-monitoring/anitya">Anitya</a></li>
+            <li><a href="https://releasebutler.now.sh/">Release Butler</a></li>
+            <li><a href="https://github.com/DataDrake/cuppa">cuppa</a></li>
+        </ul>
+        <h2>Contact</h2>
+        <p>Contact me at hello(at)nodpkg.sh.</p>
+                <h2>Included</h2>
+        <p>nodpkg monitors the following open source software projects:</p>
+        <p>
+            {%  if packages|length == 0 %}
+            <span class="empty">No packages.</span>
+        {% else %}
+            {% for package in packages -%}
+                <a href="{{ package['site'] }}">{{ package['name'] }}</a>{% if not loop.last %}, {% endif %}
+            {%- endfor %}
+        {% endif %}
+        </p>
+        <hr>
+        <div><p style="text-align: center;">Last Update: {{ date }}</p></body>
+    </body>
+</html>
