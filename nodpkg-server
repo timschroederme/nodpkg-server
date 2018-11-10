@@ -5,12 +5,20 @@ import json
 from datetime import datetime
 import requests
 from lxml import html
-import os.path
+import os
+import paramiko
+from scp import SCPClient
+from jinja2 import Template
+
 
 DATEFORMAT = "%Y-%m-%d %H:%M:%S"
 NOPACKAGES_PATH = "nopackages/*.json"
 LATEST_VERSIONS = ".latest-versions"
 LATEST_CHECKS = ".latest-checks"
+TEMPLATE = "template.jinja2"
+REMOTE_PATH = "/opt/nodpkg/index.html"
+TEMP_PATH = "/tmp/index.html"
+CREDENTIALS_FILE = ".credentials.json"
 
 
 def scrape(url, xpath):
@@ -63,19 +71,62 @@ def store_latest_checks(checks):
         file.write(json.dumps(checks, indent=2))
 
 
+def load_credentials(path):
+    if os.path.exists(path):
+        with open(path, 'r') as file:
+            return json.loads(file.read())
+    else:
+        return {}
+
+
 def broadcast_update():
-    print("update!")
+    print("  .. publishing to Twitter")
+    # TODO
+
+
+def update_site(p, host, user):
+
+    print("Updating website..")
+
+    # Generate page
+    with open(TEMPLATE, 'r') as file:
+        raw = file.read()
+    template = Template(raw, trim_blocks=True, lstrip_blocks=True)
+    ps = sorted(p, key=lambda k: k['name'])
+
+    variables = {
+        "date": datetime.today().strftime('%-d.%m.%Y'),
+        "packages": ps
+    }
+    html = template.render(variables)
+
+    # Store page locally
+    with open (TEMP_PATH, 'w') as file:
+        file.write(html)
+
+    # Upload page to web server
+    ssh = paramiko.SSHClient()
+    ssh.load_system_host_keys()  # Assuming system-wide ssh access is configured
+    ssh.connect(hostname=host, username=user, port=22)
+    with SCPClient(ssh.get_transport()) as scp:
+        scp.put(TEMP_PATH, REMOTE_PATH)
+
+    # Remove local page
+    os.remove(TEMP_PATH)
 
 
 # Main
+credentials = load_credentials(CREDENTIALS_FILE)  # Load credentials for website publishing and Twitter
 any_change = False
 latest_versions = load_latest_versions()
 latest_checks = load_latest_checks()
+packages = []  # We need that to update the website
 
 # Main Update Loop
 for filename in glob.glob(NOPACKAGES_PATH):
     with open(filename) as f:
         data = json.load(f)
+        packages.append(data)
         name = data['name']
         print(name + "..", end='')
 
@@ -85,7 +136,7 @@ for filename in glob.glob(NOPACKAGES_PATH):
             stamp = datetime.strptime(latest_checks[name], DATEFORMAT)
             delta = datetime.now() - stamp
             h = divmod(delta.total_seconds(), 3600)[0]  # hours
-            if h < 12:
+            if h < 12:  # Don't check a project page more often than every 12 hours
                 needs_check = False
                 print (" skip")
 
@@ -97,13 +148,19 @@ for filename in glob.glob(NOPACKAGES_PATH):
                     print (" ok")
                 else:
                     print (" new release")
+                    any_change = True
                     latest_versions[name] = v
                     broadcast_update()
             else:
                 print (" initial check")
+                any_change = True
                 latest_versions[name] = v
             latest_checks[name] = datetime.now().strftime(DATEFORMAT)
 
 # Store updated metadata
 store_latest_versions(latest_versions)
 store_latest_checks(latest_checks)
+
+# Update website
+if any_change:
+    update_site(packages, credentials['server-hostname'], credentials['server-username'])
