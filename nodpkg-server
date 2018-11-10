@@ -98,11 +98,11 @@ def update_site(p, host, user):
         "date": datetime.today().strftime('%-d.%m.%Y'),
         "packages": ps
     }
-    html = template.render(variables)
+    parsed = template.render(variables)
 
     # Store page locally
-    with open (TEMP_PATH, 'w') as file:
-        file.write(html)
+    with open(TEMP_PATH, 'w') as file:
+        file.write(parsed)
 
     # Upload page to web server
     ssh = paramiko.SSHClient()
@@ -138,21 +138,21 @@ for filename in glob.glob(NOPACKAGES_PATH):
             h = divmod(delta.total_seconds(), 3600)[0]  # hours
             if h < 12:  # Don't check a project page more often than every 12 hours
                 needs_check = False
-                print (" skip")
+                print(" skip")
 
         if needs_check:
             # check if new release is available
             v = scrape(data['url'], data['xpath'])
             if name in latest_versions:
                 if latest_versions[name] == v:
-                    print (" ok")
+                    print(" ok")
                 else:
-                    print (" new release")
+                    print(" new release")
                     any_change = True
                     latest_versions[name] = v
                     broadcast_update()
             else:
-                print (" initial check")
+                print(" initial check")
                 any_change = True
                 latest_versions[name] = v
             latest_checks[name] = datetime.now().strftime(DATEFORMAT)
