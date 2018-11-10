@@ -1,0 +1,6 @@
+{
+  "name":   "openssh-portable",
+  "site":   "https://github.com/openssh/openssh-portable",
+  "url":    "https://github.com/openssh/openssh-portable/releases/latest",
+  "xpath":  "/html/body/div[4]/div/div/div[2]/div[1]/div[3]/div/div[1]/div/div/div/div[1]/h4/a"
+}
