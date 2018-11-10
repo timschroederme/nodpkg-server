@@ -1,0 +1,6 @@
+{
+  "name":   "bash",
+  "site":   "http://git.savannah.gnu.org/cgit/bash.git",
+  "url":    "http://git.savannah.gnu.org/cgit/bash.git",
+  "xpath":  "/html/body/div/div[1]/table/tr[11]/td[1]/a"
+}
