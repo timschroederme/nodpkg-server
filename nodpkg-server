@@ -9,6 +9,7 @@ import os
 import paramiko
 from scp import SCPClient
 from jinja2 import Template
+import tweepy
 
 
 DATEFORMAT = "%Y-%m-%d %H:%M:%S"
@@ -79,9 +80,12 @@ def load_credentials(path):
         return {}
 
 
-def broadcast_update():
+def broadcast_update(consumer_key, consumer_secret, access_token, access_token_secret, message):
     print("  .. publishing to Twitter")
-    # TODO
+    auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+    auth.set_access_token(access_token, access_token_secret)
+    api = tweepy.API(auth)
+    api.update_status(message)
 
 
 def update_site(p, host, user):
@@ -150,7 +154,12 @@ for filename in glob.glob(NOPACKAGES_PATH):
                     print(" new release")
                     any_change = True
                     latest_versions[name] = v
-                    broadcast_update()
+                    msg = data['name'] + ' was updated to v' + v + ' ' + data['site'] + ' #' + data['name'] + '.'
+                    broadcast_update(credentials['twitter-consumer-key'],
+                                     credentials['twitter-consumer-secret'],
+                                     credentials['twitter-access-token'],
+                                     credentials['twitter-access-secret'],
+                                     msg)
             else:
                 print(" initial check")
                 any_change = True
