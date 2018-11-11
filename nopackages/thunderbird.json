@@ -1,0 +1,6 @@
+{
+  "name":   "thunderbird",
+  "site":   "https://www.thunderbird.net/releases",
+  "url":    "https://www.thunderbird.net/releases",
+  "xpath":  "/html/body/div[2]/div/div[2]/ol/li[1]/ol/li[2]/a"
+}
