@@ -17,7 +17,6 @@ NOPACKAGES_PATH = "nopackages/*.json"
 LATEST_VERSIONS = ".latest-versions"
 LATEST_CHECKS = ".latest-checks"
 TEMPLATE = "template.jinja2"
-REMOTE_PATH = "/opt/nodpkg/index.html"
 TEMP_PATH = "/tmp/index.html"
 CREDENTIALS_FILE = ".credentials.json"
 
@@ -151,7 +150,7 @@ def update_site(p, host, user):
     ssh.load_system_host_keys()  # Assuming system-wide ssh access is configured
     ssh.connect(hostname=host, username=user, port=22)
     with SCPClient(ssh.get_transport()) as scp:
-        scp.put(TEMP_PATH, REMOTE_PATH)
+        scp.put(TEMP_PATH, "")  # We don't need a remote path due to authorized_keys setup on web server
 
     # Remove local page
     os.remove(TEMP_PATH)
