@@ -110,6 +110,22 @@ def broadcast_update(consumer_key, consumer_secret, access_token, access_token_s
     api.update_status(message)
 
 
+# Udates the nodpkg.sh website
+#
+# will create a html file locally and then copy to web server via scp
+# assumes that ssh configuration is in place for the user executing this script
+# it is recommended to create a dedicated user account on the web server
+# and to restrict access to the web server by addition restrictions in authorized_keys file
+#
+# configuration:
+# .credentials.json file must contain:
+#   * server-hostname key with domain or ip address of web server
+#   * server-username key with name of user whose ssh credentials shall be used
+#
+# parameters:
+#   * p: list of json dicts, each dict representing one watched project and must contain name key
+#   * host: as defined in .credentials.json file
+#   * user: as defined in .credentials.json file
 def update_site(p, host, user):
 
     print("Updating website..")
