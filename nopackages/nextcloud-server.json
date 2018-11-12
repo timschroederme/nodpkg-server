@@ -2,5 +2,6 @@
   "name":   "nextcloud-server",
   "site":   "https://github.com/nextcloud/server",
   "url":    "https://github.com/nextcloud/server/releases",
-  "xpath":  "/html/body/div[4]/div/div/div[2]/div[1]/div[3]/div/div[1]/div/div/div/div/h4/a"
+  "xpath":  "/html/body/div[4]/div/div/div[2]/div[1]/div[3]/div/div[1]/div/div/div/div/h4/a",
+  "tag":    "nextcloud"
 }

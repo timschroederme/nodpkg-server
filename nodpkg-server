@@ -206,7 +206,7 @@ for filename in glob.glob(filepath):
                     print(" new release")
                     any_change = True
                     latest_versions[name] = v
-                    msg = data['name'] + ' was updated to v' + v + ' ' + data['site'] + ' #' + data['name'] + '.'
+                    msg = data['name'] + ' was updated to v' + v + ' ' + data['site'] + ' #' + data['tag'] + '.'
                     broadcast_update(credentials['twitter-consumer-key'],
                                      credentials['twitter-consumer-secret'],
                                      credentials['twitter-access-token'],

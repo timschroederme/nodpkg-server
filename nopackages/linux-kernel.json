@@ -2,5 +2,6 @@
   "name":   "linux-kernel",
   "site":   "https://www.kernel.org/",
   "url":    "https://www.kernel.org/",
-  "xpath":  "//*[@id='latest_link']/a"
+  "xpath":  "//*[@id='latest_link']/a",
+  "tag":    "linuxkernel"
 }

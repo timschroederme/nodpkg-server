@@ -2,5 +2,6 @@
   "name":   "ruby-rails",
   "site":   "https://github.com/rails/rails",
   "url":    "https://github.com/rails/rails/releases/latest",
-  "xpath":  "/html/body/div[4]/div/div/div[2]/div[1]/div[3]/div/div[1]/div/div/div/div[2]/pre"
+  "xpath":  "/html/body/div[4]/div/div/div[2]/div[1]/div[3]/div/div[1]/div/div/div/div[2]/pre",
+  "tag":    "rails"
 }
