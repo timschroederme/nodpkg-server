@@ -21,6 +21,14 @@ TEMP_PATH = "/tmp/index.html"
 CREDENTIALS_FILE = ".credentials.json"
 
 
+# Returns path of script
+# required to read out credentials file and to write latest_.. files
+# when script is run from cron etc.
+def scriptpath():
+    path = os.path.dirname(os.path.realpath(__file__)) + '/'
+    return path
+
+
 def scrape(url, xpath):
     response = requests.get(url)
     tree = html.fromstring(response.content)
@@ -68,32 +76,37 @@ def scrape(url, xpath):
 
 
 def load_latest_versions():
-    if os.path.exists(LATEST_VERSIONS):
-        with open(LATEST_VERSIONS, 'r') as file:
+    path = scriptpath() + LATEST_VERSIONS
+    if os.path.exists(path):
+        with open(path, 'r') as file:
             return json.loads(file.read())
     else:
         return {}
 
 
 def store_latest_versions(versions):
-    with open(LATEST_VERSIONS, 'w') as file:
+    path = scriptpath() + LATEST_VERSIONS
+    with open(path, 'w') as file:
         file.write(json.dumps(versions, indent=2))
 
 
 def load_latest_checks():
-    if os.path.exists(LATEST_CHECKS):
-        with open(LATEST_CHECKS, 'r') as file:
+    path = scriptpath() + LATEST_CHECKS
+    if os.path.exists(path):
+        with open(path, 'r') as file:
             return json.loads(file.read())
     else:
         return {}
 
 
 def store_latest_checks(checks):
-    with open(LATEST_CHECKS, 'w') as file:
+    path = scriptpath() + LATEST_CHECKS
+    with open(path, 'w') as file:
         file.write(json.dumps(checks, indent=2))
 
 
-def load_credentials(path):
+def load_credentials():
+    path = scriptpath() + CREDENTIALS_FILE
     if os.path.exists(path):
         with open(path, 'r') as file:
             return json.loads(file.read())
@@ -130,7 +143,8 @@ def update_site(p, host, user):
     print("Updating website..")
 
     # Generate page
-    with open(TEMPLATE, 'r') as file:
+    path = scriptpath() + TEMPLATE
+    with open(path, 'r') as file:
         raw = file.read()
     template = Template(raw, trim_blocks=True, lstrip_blocks=True)
     ps = sorted(p, key=lambda k: k['name'])
@@ -157,14 +171,15 @@ def update_site(p, host, user):
 
 
 # Main
-credentials = load_credentials(CREDENTIALS_FILE)  # Load credentials for website publishing and Twitter
+credentials = load_credentials()  # Load credentials for website publishing and Twitter
 any_change = False
 latest_versions = load_latest_versions()
 latest_checks = load_latest_checks()
 packages = []  # We need that to update the website
 
 # Main Update Loop
-for filename in glob.glob(NOPACKAGES_PATH):
+filepath = scriptpath() + NOPACKAGES_PATH
+for filename in glob.glob(filepath):
     with open(filename) as f:
         data = json.load(f)
         packages.append(data)
